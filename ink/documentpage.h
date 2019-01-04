@@ -32,6 +32,7 @@ class DocumentPage : public QGraphicsScene
         explicit DocumentPage(QObject *parent = nullptr);
         ~DocumentPage();
 
+        QGraphicsItem* pageRect();
     signals:
 
     public slots:

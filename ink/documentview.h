@@ -32,6 +32,11 @@ class DocumentView : public QGraphicsView
         explicit DocumentView(QWidget *parent = nullptr);
         ~DocumentView();
 
+        enum Tools {
+            Pen,
+            Eraser
+        };
+
         Document* document();
     signals:
 
@@ -46,6 +51,7 @@ class DocumentView : public QGraphicsView
         void mousePressEvent(QMouseEvent* event);
         void mouseMoveEvent(QMouseEvent* event);
         void mouseReleaseEvent(QMouseEvent* event);
+        void tabletEvent(QTabletEvent* event);
 };
 
 #endif // DOCUMENTVIEW_H

@@ -45,3 +45,7 @@ void DocumentPage::setPageSize(int width, int height) {
     d->pageRect = this->addRect(this->sceneRect(), QColor(255, 0, 0), QColor(255, 255, 255));
 
 }
+
+QGraphicsItem* DocumentPage::pageRect() {
+    return d->pageRect;
+}
