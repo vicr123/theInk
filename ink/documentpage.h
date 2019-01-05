@@ -33,7 +33,7 @@ class DocumentPage : public QGraphicsScene
         ~DocumentPage();
 
         QGraphicsItem* pageRect();
-        QJsonObject save();
+        QJsonObject save(QJsonArray& penDictionary);
     signals:
 
     public slots:

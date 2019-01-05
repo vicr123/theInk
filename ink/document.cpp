@@ -51,11 +51,14 @@ DocumentPage* Document::getPage(int page) {
 QByteArray Document::save() {
     QJsonObject rootObj;
     rootObj.insert("version", 0);
-    QJsonArray pages;
+
+
+    QJsonArray pages, penDict;
     for (DocumentPage* p : d->pages) {
-        pages.append(p->save());
+        pages.append(p->save(penDict));
     }
     rootObj.insert("pages", pages);
+    rootObj.insert("pens", penDict);
 
     QJsonDocument doc(rootObj);
     QByteArray data = doc.toJson(QJsonDocument::Compact);
