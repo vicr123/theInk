@@ -50,9 +50,15 @@ class MainWindow : public QMainWindow
 
         void on_actionClose_triggered();
 
+        void on_actionSave_triggered();
+
+        void on_actionSaveAs_triggered();
+
     private:
         Ui::MainWindow *ui;
         MainWindowPrivate* d;
+
+        void closeEvent(QCloseEvent* event);
 };
 
 #endif // MAINWINDOW_H

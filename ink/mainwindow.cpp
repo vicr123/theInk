@@ -103,3 +103,17 @@ void MainWindow::on_actionClose_triggered()
 {
     closeCurrentTab();
 }
+
+void MainWindow::on_actionSave_triggered()
+{
+    currentDocument()->save();
+}
+
+void MainWindow::closeEvent(QCloseEvent* event) {
+    while (ui->docStack->count() > 0) closeCurrentTab();
+}
+
+void MainWindow::on_actionSaveAs_triggered()
+{
+    currentDocument()->saveAs();
+}

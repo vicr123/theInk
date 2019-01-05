@@ -50,6 +50,9 @@ class DocumentView : public QGraphicsView
         void setPageNumber(int pageNo);
         void setActive(bool active);
 
+        bool save();
+        bool saveAs();
+
     private:
         DocumentViewPrivate* d;
 

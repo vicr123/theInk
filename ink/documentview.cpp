@@ -21,11 +21,14 @@
 
 #include <QMouseEvent>
 #include <QScroller>
+#include <QEventLoop>
+#include <QFileDialog>
 #include "tabbutton.h"
 
 struct DocumentViewPrivate {
     Document* loadedDoc = nullptr;
     TabButton* tabButton;
+    QString currentFile;
     int pageNo;
 
     bool tabletListening = false;
@@ -170,3 +173,57 @@ void DocumentView::setActive(bool active) {
     d->active = active;
 }
 
+bool DocumentView::save() {
+    if (d->currentFile == "") {
+        return saveAs();
+    }
+
+    //Attempt to save the current document
+    QFile file(d->currentFile);
+
+    if (!file.open(QFile::WriteOnly)) {
+        if (!(file.permissions() & QFile::WriteUser)) {
+            //error = "Permissions";
+        } else {
+            //error = "Can't open file";
+        }
+        return false;
+    }
+
+    QByteArray data = d->loadedDoc->save();
+    if (d->currentFile.endsWith(".tinz")) {
+        data = qCompress(data, 9);
+    }
+
+    qint64 written = file.write(data);
+    if (written == -1) {
+        return false;
+    }
+
+    file.close();
+    return true;
+}
+
+bool DocumentView::saveAs() {
+    QEventLoop* loop = new QEventLoop();
+    QFileDialog* saveDialog = new QFileDialog(this->window(), Qt::Sheet);
+    saveDialog->setWindowModality(Qt::WindowModal);
+    saveDialog->setAcceptMode(QFileDialog::AcceptSave);
+    saveDialog->setDirectory(QDir::home());
+    saveDialog->setNameFilters(QStringList() << "Compressed theInk Notebook (*.tinz)"
+                                             << "theInk Notebook (*.tink)"
+                                             << "All Files (*)");
+    connect(saveDialog, SIGNAL(finished(int)), saveDialog, SLOT(deleteLater()));
+    connect(saveDialog, SIGNAL(finished(int)), loop, SLOT(quit()));
+    saveDialog->show();
+
+    //Block until dialog is finished
+    loop->exec();
+    loop->deleteLater();
+
+    if (saveDialog->result() == QDialog::Accepted) {
+        d->currentFile = saveDialog->selectedFiles().first();
+        return save();
+    }
+    return false;
+}

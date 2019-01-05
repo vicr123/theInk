@@ -20,6 +20,8 @@
 #include "documentpage.h"
 
 #include <QGraphicsRectItem>
+#include <QJsonObject>
+#include <QJsonArray>
 
 struct DocumentPagePrivate {
     QGraphicsRectItem* pageRect = nullptr;
@@ -48,4 +50,41 @@ void DocumentPage::setPageSize(int width, int height) {
 
 QGraphicsItem* DocumentPage::pageRect() {
     return d->pageRect;
+}
+
+QJsonObject DocumentPage::save() {
+    QJsonObject data;
+    data.insert("pageWidth", this->sceneRect().size().width());
+    data.insert("pageHeight", this->sceneRect().size().height());
+
+    const int lineType = QGraphicsLineItem().type();
+
+    QJsonArray pathData;
+    for (QGraphicsItem* i : this->items()) {
+        if (i == d->pageRect) continue;
+        QJsonObject itemData;
+        if (i->type() == lineType) {
+            //Line
+            QGraphicsLineItem* line = qgraphicsitem_cast<QGraphicsLineItem*>(i);
+            itemData.insert("type", "line");
+
+            QJsonObject points;
+            points.insert("x1", line->line().x1());
+            points.insert("y1", line->line().y1());
+            points.insert("x2", line->line().x2());
+            points.insert("y2", line->line().y2());
+            itemData.insert("points", points);
+
+            QJsonObject pen;
+            pen.insert("color", QJsonValue::fromVariant(line->pen().color()));
+            pen.insert("width", line->pen().widthF());
+            itemData.insert("pen", pen);
+        } else {
+            itemData.insert("type", "undefined");
+        }
+        pathData.append(itemData);
+    }
+    data.insert("pathData", pathData);
+
+    return data;
 }

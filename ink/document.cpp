@@ -18,6 +18,11 @@
  *
  * *************************************/
 #include "document.h"
+#include <QDataStream>
+
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QJsonDocument>
 
 struct DocumentPrivate {
     QList<DocumentPage*> pages;
@@ -41,4 +46,19 @@ QString Document::title() {
 
 DocumentPage* Document::getPage(int page) {
     return d->pages.at(page);
+}
+
+QByteArray Document::save() {
+    QJsonObject rootObj;
+    rootObj.insert("version", 0);
+    QJsonArray pages;
+    for (DocumentPage* p : d->pages) {
+        pages.append(p->save());
+    }
+    rootObj.insert("pages", pages);
+
+    QJsonDocument doc(rootObj);
+    QByteArray data = doc.toJson(QJsonDocument::Compact);
+
+    return data;
 }

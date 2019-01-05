@@ -34,6 +34,7 @@ class Document : public QObject
 
         DocumentPage* getPage(int page);
         QString title();
+        QByteArray save();
     signals:
 
     public slots:
