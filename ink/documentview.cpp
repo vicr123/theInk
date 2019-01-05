@@ -20,6 +20,7 @@
 #include "documentview.h"
 
 #include <QMouseEvent>
+#include <QScroller>
 
 struct DocumentViewPrivate {
     Document* loadedDoc;
@@ -35,6 +36,9 @@ DocumentView::DocumentView(QWidget *parent) : QGraphicsView(parent)
 {
     d = new DocumentViewPrivate();
     setDocument(new Document());
+    this->viewport()->setAttribute(Qt::WA_AcceptTouchEvents);
+
+    QScroller::grabGesture(this->viewport(), QScroller::TouchGesture);
 }
 
 DocumentView::~DocumentView() {
@@ -63,10 +67,12 @@ void DocumentView::resizeEvent(QResizeEvent *event) {
 }
 
 void DocumentView::mousePressEvent(QMouseEvent *event) {
+    if (event->source() == Qt::MouseEventSynthesizedByQt) return;
     d->lastCoordinates = event->pos();
 }
 
 void DocumentView::mouseMoveEvent(QMouseEvent *event) {
+    if (event->source() == Qt::MouseEventSynthesizedByQt) return;
     if (d->currentTool == Pen) {
         //Draw a line
         QPen linePen;
@@ -85,6 +91,7 @@ void DocumentView::mouseMoveEvent(QMouseEvent *event) {
 }
 
 void DocumentView::mouseReleaseEvent(QMouseEvent *event) {
+    if (event->source() == Qt::MouseEventSynthesizedByQt) return;
 
 }
 
@@ -130,5 +137,9 @@ void DocumentView::tabletEvent(QTabletEvent *event) {
     } else if (event->type() == QEvent::TabletRelease) {
         d->tabletListening = false;
     }
+    event->accept();
+}
+
+void DocumentView::touchEvent(QTouchEvent *event) {
     event->accept();
 }

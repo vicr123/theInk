@@ -21,6 +21,7 @@
 #define DOCUMENTVIEW_H
 
 #include <QWidget>
+#include <QTouchEvent>
 #include <QGraphicsView>
 #include "document.h"
 
@@ -52,6 +53,7 @@ class DocumentView : public QGraphicsView
         void mouseMoveEvent(QMouseEvent* event);
         void mouseReleaseEvent(QMouseEvent* event);
         void tabletEvent(QTabletEvent* event);
+        void touchEvent(QTouchEvent* event);
 };
 
 #endif // DOCUMENTVIEW_H
