@@ -23,19 +23,23 @@
 #include <QObject>
 #include <documentpage.h>
 
+struct DocumentPrivate;
+
 class Document : public QObject
 {
         Q_OBJECT
     public:
         explicit Document(QObject *parent = nullptr);
+        ~Document();
 
         DocumentPage* getPage(int page);
+        QString title();
     signals:
 
     public slots:
 
     private:
-        QList<DocumentPage*> pages;
+        DocumentPrivate* d;
 };
 
 #endif // DOCUMENT_H

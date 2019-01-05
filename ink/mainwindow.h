@@ -26,6 +26,9 @@ namespace Ui {
     class MainWindow;
 }
 
+struct MainWindowPrivate;
+class DocumentView;
+
 class MainWindow : public QMainWindow
 {
         Q_OBJECT
@@ -34,8 +37,22 @@ class MainWindow : public QMainWindow
         explicit MainWindow(QWidget *parent = nullptr);
         ~MainWindow();
 
+        void newTab();
+        DocumentView* currentDocument();
+        bool closeCurrentTab();
+
+    private slots:
+        void on_actionNew_triggered();
+
+        void on_docStack_currentChanged(int arg1);
+
+        void on_closeButton_clicked();
+
+        void on_actionClose_triggered();
+
     private:
         Ui::MainWindow *ui;
+        MainWindowPrivate* d;
 };
 
 #endif // MAINWINDOW_H

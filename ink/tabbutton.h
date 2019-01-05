@@ -1,6 +1,6 @@
 /****************************************
  *
- *   theInk - Journal
+ *   theInk - Interactive Notebook
  *   Copyright (C) 2019 Victor Tran
  *
  *   This program is free software: you can redistribute it and/or modify
@@ -17,28 +17,37 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * *************************************/
-#include "document.h"
+#ifndef TABBUTTON_H
+#define TABBUTTON_H
 
-struct DocumentPrivate {
-    QList<DocumentPage*> pages;
-    QString title;
+#include <QPushButton>
+#include <QPaintEvent>
+#include <QPainter>
+
+class DocumentView;
+
+class TabButton : public QPushButton
+{
+    Q_OBJECT
+public:
+    explicit TabButton(QWidget *parent = 0);
+    explicit TabButton(DocumentView* editor, QWidget *parent = 0);
+
+    void setActive(bool active);
+signals:
+
+public slots:
+
+private slots:
+    void updateTitle(QString title);
+    void updateIcon(QIcon icon);
+
+private:
+    DocumentView* editor;
+    bool active;
+
+    void paintEvent(QPaintEvent* event);
+    QSize sizeHint() const;
 };
 
-Document::Document(QObject *parent) : QObject(parent)
-{
-    d = new DocumentPrivate();
-    d->pages.append(new DocumentPage());
-    d->title = tr("Untitled Notebook");
-}
-
-Document::~Document() {
-    delete d;
-}
-
-QString Document::title() {
-    return d->title;
-}
-
-DocumentPage* Document::getPage(int page) {
-    return d->pages.at(page);
-}
+#endif // TABBUTTON_H

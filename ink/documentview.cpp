@@ -21,12 +21,15 @@
 
 #include <QMouseEvent>
 #include <QScroller>
+#include "tabbutton.h"
 
 struct DocumentViewPrivate {
-    Document* loadedDoc;
+    Document* loadedDoc = nullptr;
+    TabButton* tabButton;
     int pageNo;
 
     bool tabletListening = false;
+    bool active = false;
 
     QPointF lastCoordinates;
     DocumentView::Tools currentTool = DocumentView::Pen;
@@ -35,6 +38,9 @@ struct DocumentViewPrivate {
 DocumentView::DocumentView(QWidget *parent) : QGraphicsView(parent)
 {
     d = new DocumentViewPrivate();
+
+    d->tabButton = new TabButton(this);
+
     setDocument(new Document());
     this->viewport()->setAttribute(Qt::WA_AcceptTouchEvents);
 
@@ -42,11 +48,22 @@ DocumentView::DocumentView(QWidget *parent) : QGraphicsView(parent)
 }
 
 DocumentView::~DocumentView() {
+    if (d->tabButton != nullptr) {
+        d->tabButton->setVisible(false);
+        d->tabButton->deleteLater();
+    }
     delete d;
 }
 
 void DocumentView::setDocument(Document* doc) {
+    if (d->loadedDoc != nullptr) {
+        disconnect(d->loadedDoc);
+        d->loadedDoc->deleteLater();
+    }
+
     d->loadedDoc = doc;
+    tabButton()->setText(d->loadedDoc->title());
+
     setPageNumber(0);
 }
 
@@ -143,3 +160,13 @@ void DocumentView::tabletEvent(QTabletEvent *event) {
 void DocumentView::touchEvent(QTouchEvent *event) {
     event->accept();
 }
+
+TabButton* DocumentView::tabButton() {
+    return d->tabButton;
+}
+
+void DocumentView::setActive(bool active) {
+    d->tabButton->setActive(active);
+    d->active = active;
+}
+

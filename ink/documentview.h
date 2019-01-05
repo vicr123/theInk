@@ -26,6 +26,8 @@
 #include "document.h"
 
 struct DocumentViewPrivate;
+class TabButton;
+
 class DocumentView : public QGraphicsView
 {
         Q_OBJECT
@@ -39,11 +41,14 @@ class DocumentView : public QGraphicsView
         };
 
         Document* document();
+        TabButton* tabButton();
+
     signals:
 
     public slots:
         void setDocument(Document* doc);
         void setPageNumber(int pageNo);
+        void setActive(bool active);
 
     private:
         DocumentViewPrivate* d;
