@@ -18,11 +18,11 @@
  *
  * *************************************/
 #include "mainwindow.h"
-#include <QApplication>
+#include <tapplication.h>
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
+    tApplication a(argc, argv);
     MainWindow w;
     w.show();
 

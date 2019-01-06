@@ -22,6 +22,7 @@
 
 #include "documentview.h"
 #include "tabbutton.h"
+#include <tapplication.h>
 
 struct MainWindowPrivate {
     QList<DocumentView*> documents;
@@ -116,4 +117,9 @@ void MainWindow::closeEvent(QCloseEvent* event) {
 void MainWindow::on_actionSaveAs_triggered()
 {
     currentDocument()->saveAs();
+}
+
+void MainWindow::on_actionExit_triggered()
+{
+    tApplication::closeAllWindows();
 }

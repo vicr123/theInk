@@ -8,8 +8,32 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = theink
+TARGET = theInk
 TEMPLATE = app
+
+macx {
+    QT += macextras
+    ICON = icon.icns
+    LIBS += -framework CoreFoundation -framework AppKit
+    QMAKE_INFO_PLIST = Info.plist
+}
+
+unix:!macx {
+    QT += thelib
+    TARGET = theink
+}
+
+win32 {
+    QT += thelib
+    INCLUDEPATH += "C:/Program Files/thelibs/include"
+    LIBS += -L"C:/Program Files/thelibs/lib" -lthe-libs
+    RC_FILE = icon.rc
+}
+
+macx {
+    INCLUDEPATH += "/usr/local/include/the-libs"
+    LIBS += -L/usr/local/lib -lthe-libs
+}
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
@@ -44,7 +68,24 @@ HEADERS += \
 FORMS += \
         mainwindow.ui
 
-# Default rules for deployment.
-qnx: target.path = /tmp/$${TARGET}/bin
-else: unix:!android: target.path = /opt/$${TARGET}/bin
-!isEmpty(target.path): INSTALLS += target
+
+# Turn off stripping as this causes the install to fail :(
+QMAKE_STRIP = echo
+
+unix:!macx {
+    target.path = /usr/bin
+
+    #translations.path = /usr/share/theink/translations
+    #translations.files = translations/*
+
+    desktop.path = /usr/share/applications
+    desktop.files = theink.desktop
+
+    #icon.path = /usr/share/icons/hicolor/scalable/apps/
+    #icon.files = icons/theink.svg
+
+    INSTALLS += target desktop #translations icon
+}
+
+DISTFILES += \
+    theink.desktop
