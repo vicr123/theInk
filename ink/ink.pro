@@ -30,14 +30,16 @@ SOURCES += \
     documentview.cpp \
     document.cpp \
     documentpage.cpp \
-    tabbutton.cpp
+    tabbutton.cpp \
+    documentformat.cpp
 
 HEADERS += \
         mainwindow.h \
     documentview.h \
     document.h \
     documentpage.h \
-    tabbutton.h
+    tabbutton.h \
+    documentformat.h
 
 FORMS += \
         mainwindow.ui

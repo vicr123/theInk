@@ -17,48 +17,21 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * *************************************/
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef DOCUMENTFORMAT_H
+#define DOCUMENTFORMAT_H
 
-#include <QMainWindow>
+#include <QPen>
+#include <QJsonArray>
 
-namespace Ui {
-    class MainWindow;
-}
-
-struct MainWindowPrivate;
-class DocumentView;
-
-class MainWindow : public QMainWindow
+class DocumentFormat
 {
-        Q_OBJECT
-
     public:
-        explicit MainWindow(QWidget *parent = nullptr);
-        ~MainWindow();
-
-        void newTab();
-        DocumentView* currentDocument();
-        bool closeCurrentTab();
-
-    private slots:
-        void on_actionNew_triggered();
-
-        void on_docStack_currentChanged(int arg1);
-
-        void on_closeButton_clicked();
-
-        void on_actionClose_triggered();
-
-        void on_actionSave_triggered();
-
-        void on_actionSaveAs_triggered();
+        static int getPen(QPen pen, QJsonArray& penDictionary);
+        static QString encodeFloat(qreal point);
+        static qreal decodeFloat(QString point);
 
     private:
-        Ui::MainWindow *ui;
-        MainWindowPrivate* d;
-
-        void closeEvent(QCloseEvent* event);
+        explicit DocumentFormat();
 };
 
-#endif // MAINWINDOW_H
+#endif // DOCUMENTFORMAT_H

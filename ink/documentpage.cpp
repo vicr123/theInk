@@ -1,6 +1,6 @@
 /****************************************
  *
- *   theInk - Journal
+ *   theInk - Interactive Notebook
  *   Copyright (C) 2019 Victor Tran
  *
  *   This program is free software: you can redistribute it and/or modify
@@ -22,6 +22,7 @@
 #include <QGraphicsRectItem>
 #include <QJsonObject>
 #include <QJsonArray>
+#include "documentformat.h"
 
 struct DocumentPagePrivate {
     QGraphicsRectItem* pageRect = nullptr;
@@ -59,25 +60,6 @@ QJsonObject DocumentPage::save(QJsonArray& penDictionary) {
 
     const int lineType = QGraphicsLineItem().type();
 
-    auto getPen = [=, &penDictionary](QPen pen) -> int {
-        for (int i = 0; i < penDictionary.count(); i++) {
-            QJsonObject penDef = penDictionary.at(i).toObject();
-            QColor color = penDef.value("color").toVariant().value<QColor>();
-            qreal width = penDef.value("width").toDouble();
-
-            if (pen.color() == color && pen.widthF() == width) {
-                return i;
-            }
-        }
-
-        //No matching pen definition found, create a new one
-        QJsonObject penDef;
-        penDef.insert("color", QJsonValue::fromVariant(pen.color()));
-        penDef.insert("width", pen.widthF());
-        penDictionary.append(penDef);
-        return penDictionary.count() - 1;
-    };
-
     QJsonArray pathData;
     QJsonObject lastItemData;
     for (QGraphicsItem* i : this->items()) {
@@ -89,34 +71,39 @@ QJsonObject DocumentPage::save(QJsonArray& penDictionary) {
             itemData.insert("type", "line");
 
             QJsonObject points;
-            qreal lastX1 = -1, lastX2 = -1, lastY1 = -1, lastY2 = -1;
+            QString x1 = DocumentFormat::encodeFloat(line->line().x1());
+            QString y1 = DocumentFormat::encodeFloat(line->line().y1());
+            QString x2 = DocumentFormat::encodeFloat(line->line().x2());
+            QString y2 = DocumentFormat::encodeFloat(line->line().y2());
+
+            QString lastX1 = "", lastX2 = "", lastY1 = "", lastY2 = "";
             if (lastItemData.value("type") == "line") {
                 QJsonObject lastPoints = lastItemData.value("points").toObject();
-                lastX1 = lastPoints.value("x1").toDouble();
-                lastY1 = lastPoints.value("y1").toDouble();
-                lastX2 = lastPoints.value("x2").toDouble();
-                lastY2 = lastPoints.value("y2").toDouble();
+                lastX1 = lastPoints.value("x1").toString();
+                lastY1 = lastPoints.value("y1").toString();
+                lastX2 = lastPoints.value("x2").toString();
+                lastY2 = lastPoints.value("y2").toString();
             }
 
-            if ((lastX1 == line->line().x1() && lastY1 == line->line().y1()) || (lastX2 == line->line().x1() && lastY2 == line->line().y1())) {
+            if ((lastX1 == x1 && lastY1 == y1) || (lastX2 == x1 && lastY2 == y1)) {
                 //Save the second set normally because that's the data we don't have
-                points.insert("x2", line->line().x2());
-                points.insert("y2", line->line().y2());
-            } else if ((lastX1 == line->line().x2() && lastY1 == line->line().y2()) || (lastX2 == line->line().x2() && lastY2 == line->line().y2())) {
+                points.insert("x2", x2);
+                points.insert("y2", y2);
+            } else if ((lastX1 == x2 && lastY1 == y2) || (lastX2 == x2 && lastY2 == y2)) {
                 //Save the first set as the second set normally because that's the data we don't have
-                points.insert("x2", line->line().x1());
-                points.insert("y2", line->line().y1());
+                points.insert("x2", x1);
+                points.insert("y2", y1);
             } else {
                 //Save everything normally
-                points.insert("x1", line->line().x1());
-                points.insert("y1", line->line().y1());
-                points.insert("x2", line->line().x2());
-                points.insert("y2", line->line().y2());
+                points.insert("x1", x1);
+                points.insert("y1", y1);
+                points.insert("x2", x2);
+                points.insert("y2", y2);
             }
 
             itemData.insert("points", points);
 
-            itemData.insert("pen", getPen(line->pen()));
+            itemData.insert("pen", DocumentFormat::getPen(line->pen(), penDictionary));
         } else {
             itemData.insert("type", "undefined");
         }

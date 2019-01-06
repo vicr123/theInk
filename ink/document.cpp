@@ -1,6 +1,6 @@
 /****************************************
  *
- *   theInk - Journal
+ *   theInk - Interactive Notebook
  *   Copyright (C) 2019 Victor Tran
  *
  *   This program is free software: you can redistribute it and/or modify
@@ -62,6 +62,7 @@ QByteArray Document::save() {
 
     QJsonDocument doc(rootObj);
     QByteArray data = doc.toJson(QJsonDocument::Compact);
+
 
     return data;
 }
