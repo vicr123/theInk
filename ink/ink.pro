@@ -81,11 +81,14 @@ unix:!macx {
     desktop.path = /usr/share/applications
     desktop.files = theink.desktop
 
-    #icon.path = /usr/share/icons/hicolor/scalable/apps/
-    #icon.files = icons/theink.svg
+    icon.path = /usr/share/icons/hicolor/scalable/apps/
+    icon.files = icons/theink.svg
 
-    INSTALLS += target desktop #translations icon
+    INSTALLS += target desktop icon #translations
 }
 
 DISTFILES += \
     theink.desktop
+
+RESOURCES += \
+    resources.qrc
