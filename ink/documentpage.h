@@ -32,15 +32,25 @@ class DocumentPage : public QGraphicsScene
         explicit DocumentPage(QObject *parent = nullptr);
         ~DocumentPage();
 
+        enum PageBackground {
+            None,
+            Lined
+        };
+
         QGraphicsItem* pageRect();
         QJsonObject save(QJsonArray& penDictionary);
     signals:
 
     public slots:
         void setPageSize(int width, int height);
+        void setPagePixelSize(int width, int height);
+        void setPageBackground(PageBackground background);
 
     private:
         DocumentPagePrivate* d;
+
+        void updateBackground();
+        int mmScaleFactor();
 };
 
 #endif // DOCUMENTPAGE_H

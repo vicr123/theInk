@@ -22,10 +22,14 @@
 #include <QGraphicsRectItem>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QPainter>
 #include "documentformat.h"
 
 struct DocumentPagePrivate {
     QGraphicsRectItem* pageRect = nullptr;
+    DocumentPage::PageBackground pageBackground;
+
+    int mmScaleFactor;
 };
 
 DocumentPage::DocumentPage(QObject *parent) : QGraphicsScene(parent)
@@ -33,7 +37,9 @@ DocumentPage::DocumentPage(QObject *parent) : QGraphicsScene(parent)
     d = new DocumentPagePrivate();
 
     //this->setSceneRect(0, 0, 210, 297);
+    d->mmScaleFactor = 4;
     setPageSize(210, 297);
+    setPageBackground(Lined);
 }
 
 DocumentPage::~DocumentPage() {
@@ -41,22 +47,61 @@ DocumentPage::~DocumentPage() {
 }
 
 void DocumentPage::setPageSize(int width, int height) {
-    if (d->pageRect != nullptr) {
-        this->removeItem(d->pageRect);
-    }
-    this->setSceneRect(0, 0, width, height);
-    d->pageRect = this->addRect(this->sceneRect(), QColor(255, 0, 0), QColor(255, 255, 255));
+    this->setSceneRect(0, 0, width * mmScaleFactor(), height * mmScaleFactor());
+    updateBackground();
+}
 
+void DocumentPage::setPagePixelSize(int width, int height) {
+    this->setSceneRect(0, 0, width, height);
+    updateBackground();
 }
 
 QGraphicsItem* DocumentPage::pageRect() {
     return d->pageRect;
 }
 
+void DocumentPage::setPageBackground(PageBackground background) {
+    d->pageBackground = background;
+    updateBackground();
+}
+
+void DocumentPage::updateBackground() {
+    if (d->pageRect != nullptr) {
+        this->removeItem(d->pageRect);
+    }
+
+
+    switch (d->pageBackground) {
+        case Lined: {
+            QPixmap linedBackground(this->sceneRect().size().toSize());
+            linedBackground.fill(Qt::white);
+
+            QPainter painter(&linedBackground);
+
+            //Draw lines
+            painter.setPen(QPen(QColor(0, 200, 255, 200), 1));
+            for (int i = 20 * mmScaleFactor(); i < linedBackground.height(); i += 8 * mmScaleFactor()) {
+                painter.drawLine(0, i, linedBackground.width(), i);
+            }
+
+            //Draw margin
+            painter.setPen(QPen(QColor(255, 100, 150, 200), 1));
+            painter.drawLine(20 * mmScaleFactor(), 0, 20 * mmScaleFactor(), linedBackground.height());
+
+            d->pageRect = this->addRect(this->sceneRect(), QColor(255, 0, 0), linedBackground);
+            break;
+        }
+        case None:
+            d->pageRect = this->addRect(this->sceneRect(), QColor(255, 0, 0), QColor(255, 255, 255));
+    }
+}
+
 QJsonObject DocumentPage::save(QJsonArray& penDictionary) {
     QJsonObject data;
     data.insert("pageWidth", this->sceneRect().size().width());
     data.insert("pageHeight", this->sceneRect().size().height());
+    data.insert("pageBackground", "lined");
+    data.insert("mmScaleFactor", d->mmScaleFactor);
 
     const int lineType = QGraphicsLineItem().type();
 
@@ -113,4 +158,8 @@ QJsonObject DocumentPage::save(QJsonArray& penDictionary) {
     data.insert("pathData", pathData);
 
     return data;
+}
+
+int DocumentPage::mmScaleFactor() {
+    return d->mmScaleFactor;
 }
