@@ -15,7 +15,7 @@ if [ $STAGE = "script" ]; then
     echo "[TRAVIS] Building project"
     make
     echo "[TRAVIS] Running Unit Tests"
-    xvfb-run make check
+    xvfb-run make check || { echo "[TRAVIS] Unit Tests failed"; exit 1; }
     echo "[TRAVIS] Installing into appdir"
     make install INSTALL_ROOT=~/appdir
     echo "[TRAVIS] Getting linuxdeployqt"
