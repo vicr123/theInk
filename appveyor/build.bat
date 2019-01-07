@@ -18,7 +18,7 @@ cd ..
 qmake theInk.pro
 nmake release
 mkdir deploy
-copy release\thephoto.exe deploy
+copy release\theInk.exe deploy
 copy "C:\Program Files\thelibs\lib\the-libs.dll" deploy
 cd deploy
-windeployqt thephoto.exe
+windeployqt theInk.exe
