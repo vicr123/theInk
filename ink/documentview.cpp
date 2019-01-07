@@ -47,6 +47,8 @@ DocumentView::DocumentView(QWidget *parent) : QGraphicsView(parent)
     setDocument(new Document());
     this->viewport()->setAttribute(Qt::WA_AcceptTouchEvents);
 
+    this->setRenderHint(QPainter::Antialiasing);
+
     QScroller::grabGesture(this->viewport(), QScroller::TouchGesture);
 }
 
@@ -98,7 +100,7 @@ void DocumentView::mouseMoveEvent(QMouseEvent *event) {
         QPen linePen;
         linePen.setColor(Qt::black);
         linePen.setCapStyle(Qt::RoundCap);
-        linePen.setWidthF(0.5);
+        linePen.setWidthF(2);
 
         QLineF line;
         line.setP1(this->mapToScene(d->lastCoordinates.toPoint()));
@@ -135,7 +137,7 @@ void DocumentView::tabletEvent(QTabletEvent *event) {
             QPen linePen;
             linePen.setColor(Qt::black);
             linePen.setCapStyle(Qt::RoundCap);
-            linePen.setWidthF(0.5);
+            linePen.setWidthF(2);
 
             QLineF line;
             line.setP1(this->mapToScene(d->lastCoordinates.toPoint()));
